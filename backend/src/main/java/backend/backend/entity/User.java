@@ -1,5 +1,6 @@
 package backend.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,7 +28,7 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-
+    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<Subscription> subscriptions;
 }
