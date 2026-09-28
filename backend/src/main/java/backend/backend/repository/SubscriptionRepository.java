@@ -1,5 +1,7 @@
 package backend.backend.repository;
 
+import backend.backend.dto.CategorySpendingResponse;
+import backend.backend.dto.UpcomingRenewalResponse;
 import backend.backend.entity.Subscription;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -42,4 +44,34 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
 
     // Latest subscriptions (useful for Recent Activity later)
     List<Subscription> findTop5ByOrderByIdDesc();
+
+    @Query("""
+        SELECT new backend.backend.dto.CategorySpendingResponse(
+            c.name,
+            COALESCE(SUM(s.price),0)
+        )
+        FROM Subscription s
+        JOIN s.category c
+        WHERE s.status='ACTIVE'
+        GROUP BY c.name
+        ORDER BY SUM(s.price) DESC
+""")
+    List<CategorySpendingResponse> getCategorySpending();
+
+
+    @Query("""
+        SELECT new backend.backend.dto.UpcomingRenewalResponse(
+            s.name,
+            s.provider,
+            s.renewalDate
+        )
+        FROM Subscription s
+        WHERE s.status='ACTIVE'
+        AND s.renewalDate BETWEEN :startDate AND :endDate
+        ORDER BY s.renewalDate ASC
+""")
+    List<UpcomingRenewalResponse> getUpcomingRenewals(
+            LocalDate startDate,
+            LocalDate endDate
+    );
 }

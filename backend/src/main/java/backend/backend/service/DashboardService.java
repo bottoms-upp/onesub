@@ -1,6 +1,8 @@
 package backend.backend.service;
 
+import backend.backend.dto.CategorySpendingResponse;
 import backend.backend.dto.DashboardSummaryResponse;
+import backend.backend.dto.UpcomingRenewalResponse;
 import backend.backend.entity.Subscription;
 import backend.backend.repository.SubscriptionRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,5 +34,21 @@ public class DashboardService {
                 .upcomingRenewals((long) upcoming.size())
                 .mostExpensiveSubscription(expensive)
                 .build();
+    }
+
+    public List<CategorySpendingResponse> getCategorySpending() {
+        return subscriptionRepository.getCategorySpending();
+    }
+
+    public List<UpcomingRenewalResponse> getUpcomingRenewals() {
+
+        return subscriptionRepository.getUpcomingRenewals(
+                LocalDate.now(),
+                LocalDate.now().plusDays(7)
+        );
+    }
+
+    public List<Subscription> getRecentSubscriptions() {
+        return subscriptionRepository.findTop5ByOrderByIdDesc();
     }
 }
