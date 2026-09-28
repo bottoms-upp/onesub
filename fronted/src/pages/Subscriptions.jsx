@@ -1,7 +1,9 @@
  import { useState } from "react";
  import Sidebar from "../components/Sidebar";
+ import { useNavigate } from "react-router-dom";
 
 function Subscriptions() {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
 
   const subscriptions = [
@@ -69,7 +71,8 @@ function Subscriptions() {
           </p>
         </div>
 
-        <button className="rounded-lg bg-[#6246E5] px-5 py-3 font-semibold text-white hover:bg-[#5138C9]">
+        <button 
+        onClick={() => navigate("/addSubscriptions")} className="rounded-lg bg-[#6246E5] px-5 py-3 font-semibold text-white hover:bg-[#5138C9]">
           + Add Subscription
         </button>
       </div>

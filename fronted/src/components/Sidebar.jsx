@@ -4,7 +4,7 @@ function Sidebar() {
   const menuItems = [
     { name: "Dashboard", path: "/dashboard" },
     { name: "Subscriptions", path: "/subscriptions" },
-    { name: "Add Subscription", path: "/add-subscription" },
+    { name: "Add Subscription", path: "/addSubscriptions" },
     { name: "Profile", path: "/profile" },
     { name: "Settings", path: "/settings" },
   ];
