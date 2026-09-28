@@ -72,7 +72,7 @@ function Register() {
         {/* Login link */}
         <p className="mt-6 text-center text-sm text-gray-500">
           Already have an account?{" "}
-          <a href="/login" className="font-semibold text-[#6246E5]"></a>
+          <a href="/login" className="font-semibold text-[#6246E5]">login</a>
         </p>
       </div>
     </AuthLayout>
