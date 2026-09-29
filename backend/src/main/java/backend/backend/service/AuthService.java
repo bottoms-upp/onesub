@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import backend.backend.dto.LoginResponse;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -15,7 +17,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public String register(RegisterRequest request) {
+    public LoginResponse register(RegisterRequest request) {
 
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new RuntimeException("Email already exists");
@@ -27,12 +29,17 @@ public class AuthService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .build();
 
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
 
-        return "User registered successfully";
+        return LoginResponse.builder()
+                .id(savedUser.getId())
+                .name(savedUser.getName())
+                .email(savedUser.getEmail())
+                .message("User registered successfully")
+                .build();
     }
 
-    public String login(LoginRequest request) {
+    public LoginResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Invalid email or password"));
 
@@ -40,6 +47,11 @@ public class AuthService {
             throw new RuntimeException("Invalid email or password");
         }
 
-        return "Login Successful";
+        return LoginResponse.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .message("Login Successful")
+                .build();
     }
 }

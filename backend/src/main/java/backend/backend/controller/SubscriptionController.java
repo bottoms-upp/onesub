@@ -4,13 +4,16 @@ import backend.backend.dto.SubscriptionRequest;
 import backend.backend.entity.Subscription;
 import backend.backend.service.SubscriptionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 @RestController
 @RequestMapping("/api/subscriptions")
 @RequiredArgsConstructor
 public class SubscriptionController {
+
     private final SubscriptionService subscriptionService;
 
     @PostMapping
@@ -19,7 +22,10 @@ public class SubscriptionController {
     }
 
     @GetMapping
-    public List<Subscription> getAllSubscriptions() {
+    public List<Subscription> getSubscriptions(@RequestParam(required = false) Long userId) {
+        if (userId != null) {
+            return subscriptionService.getSubscriptionsByUserId(userId);
+        }
         return subscriptionService.getAllSubscriptions();
     }
 
@@ -32,14 +38,22 @@ public class SubscriptionController {
     public Subscription updateSubscription(
             @PathVariable Long id,
             @RequestBody SubscriptionRequest request) {
-
         return subscriptionService.updateSubscription(id, request);
     }
 
-    @DeleteMapping("/{id}")
-    public String deleteSubscription(@PathVariable Long id) {
+    @PutMapping("/{id}/renew")
+    public Subscription renewSubscription(@PathVariable Long id) {
+        return subscriptionService.renewSubscription(id);
+    }
 
+    @PutMapping("/{id}/cancel")
+    public Subscription cancelSubscription(@PathVariable Long id) {
+        return subscriptionService.cancelSubscription(id);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteSubscription(@PathVariable Long id) {
         subscriptionService.deleteSubscription(id);
-        return "Subscription deleted successfully.";
+        return ResponseEntity.ok("Subscription deleted successfully.");
     }
 }

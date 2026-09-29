@@ -20,8 +20,12 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public String register(@Valid @RequestBody RegisterRequest request) {
-        return authService.register(request);
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
+        try {
+            return ResponseEntity.ok(authService.register(request));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     @PostMapping("/login")
