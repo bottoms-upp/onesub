@@ -11,7 +11,9 @@ import java.math.BigDecimal;
 public class DashboardSummaryResponse {
 
     private BigDecimal totalMonthlySpend;
+    private BigDecimal totalYearlySpend;
     private Long activeSubscriptions;
+    private Long cancelledSubscriptions;
     private Long upcomingRenewals;
     private String mostExpensiveSubscription;
 }

@@ -18,22 +18,22 @@ public class DashboardController {
     private final DashboardService dashboardService;
 
     @GetMapping("/summary")
-    public DashboardSummaryResponse getSummary() {
-        return dashboardService.getSummary();
+    public DashboardSummaryResponse getSummary(@RequestParam(required = false) Long userId) {
+        return dashboardService.getSummary(userId);
     }
 
     @GetMapping("/category-spending")
-    public List<CategorySpendingResponse> getCategorySpending() {
-        return dashboardService.getCategorySpending();
+    public List<CategorySpendingResponse> getCategorySpending(@RequestParam(required = false) Long userId) {
+        return dashboardService.getCategorySpending(userId);
     }
 
     @GetMapping("/upcoming")
-    public List<UpcomingRenewalResponse> getUpcomingRenewals() {
-        return dashboardService.getUpcomingRenewals();
+    public List<UpcomingRenewalResponse> getUpcomingRenewals(@RequestParam(required = false) Long userId) {
+        return dashboardService.getUpcomingRenewals(userId);
     }
 
     @GetMapping("/recent")
-    public List<Subscription> getRecentSubscriptions() {
-        return dashboardService.getRecentSubscriptions();
+    public List<Subscription> getRecentSubscriptions(@RequestParam(required = false) Long userId) {
+        return dashboardService.getRecentSubscriptions(userId);
     }
 }

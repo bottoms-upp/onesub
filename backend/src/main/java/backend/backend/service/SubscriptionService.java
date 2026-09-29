@@ -1,8 +1,10 @@
 package backend.backend.service;
 
 import backend.backend.dto.SubscriptionRequest;
+import backend.backend.entity.BillingCycle;
 import backend.backend.entity.Category;
 import backend.backend.entity.Subscription;
+import backend.backend.entity.SubscriptionStatus;
 import backend.backend.entity.User;
 import backend.backend.repository.CategoryRepository;
 import backend.backend.repository.SubscriptionRepository;
@@ -10,15 +12,16 @@ import backend.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class SubscriptionService {
+
     private final SubscriptionRepository subscriptionRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
-
 
     public Subscription addSubscription(SubscriptionRequest request) {
 
@@ -34,7 +37,7 @@ public class SubscriptionService {
                 .price(request.getPrice())
                 .billingCycle(request.getBillingCycle())
                 .renewalDate(request.getRenewalDate())
-                .status(request.getStatus())
+                .status(request.getStatus() != null ? request.getStatus() : SubscriptionStatus.ACTIVE)
                 .user(user)
                 .category(category)
                 .build();
@@ -44,6 +47,10 @@ public class SubscriptionService {
 
     public List<Subscription> getAllSubscriptions() {
         return subscriptionRepository.findAll();
+    }
+
+    public List<Subscription> getSubscriptionsByUserId(Long userId) {
+        return subscriptionRepository.findByUserId(userId);
     }
 
     public Subscription getSubscriptionById(Long id) {
@@ -56,9 +63,6 @@ public class SubscriptionService {
         Subscription subscription = subscriptionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Subscription not found"));
 
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found"));
 
@@ -67,19 +71,44 @@ public class SubscriptionService {
         subscription.setPrice(request.getPrice());
         subscription.setBillingCycle(request.getBillingCycle());
         subscription.setRenewalDate(request.getRenewalDate());
-        subscription.setStatus(request.getStatus());
-        subscription.setUser(user);
+        if (request.getStatus() != null) {
+            subscription.setStatus(request.getStatus());
+        }
         subscription.setCategory(category);
 
         return subscriptionRepository.save(subscription);
     }
 
-    public void deleteSubscription(Long id) {
+    public Subscription renewSubscription(Long id) {
+        Subscription subscription = subscriptionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Subscription not found"));
 
+        LocalDate baseDate = subscription.getRenewalDate().isBefore(LocalDate.now())
+                ? LocalDate.now()
+                : subscription.getRenewalDate();
+
+        if (subscription.getBillingCycle() == BillingCycle.YEARLY) {
+            subscription.setRenewalDate(baseDate.plusYears(1));
+        } else {
+            subscription.setRenewalDate(baseDate.plusMonths(1));
+        }
+        subscription.setStatus(SubscriptionStatus.ACTIVE);
+
+        return subscriptionRepository.save(subscription);
+    }
+
+    public Subscription cancelSubscription(Long id) {
+        Subscription subscription = subscriptionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Subscription not found"));
+
+        subscription.setStatus(SubscriptionStatus.CANCELLED);
+        return subscriptionRepository.save(subscription);
+    }
+
+    public void deleteSubscription(Long id) {
         if (!subscriptionRepository.existsById(id)) {
             throw new RuntimeException("Subscription not found");
         }
-
         subscriptionRepository.deleteById(id);
     }
 }

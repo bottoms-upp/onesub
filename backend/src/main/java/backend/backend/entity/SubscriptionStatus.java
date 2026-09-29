@@ -2,5 +2,7 @@ package backend.backend.entity;
 
 public enum SubscriptionStatus {
     ACTIVE,
-    CANCELED
+    CANCELLED,
+    CANCELED,
+    EXPIRED
 }
